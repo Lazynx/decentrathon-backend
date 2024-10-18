@@ -63,7 +63,7 @@ class TestService {
 
   async createCourse(
     course: Partial<ICourse>,
-    token: string,
+    telegramId: string,
     user_interest: string,
     userInput: string,
     imageBuffer: any,
@@ -126,13 +126,13 @@ class TestService {
         });
   
         const courseId = newCourse._id;
-        const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-        const userId = (userJson as any).user.toString();
+        const user = await UserModel.findOne({ telegramId });
+        if (!user) {throw new Error('user is not in the db');}
         
         // Добавляем ID курса к пользователю
         
         await User.findByIdAndUpdate(
-          userId,
+          user._id,
           { $push: { user_courses: courseId } },
           { new: true }
         );
@@ -188,13 +188,13 @@ class TestService {
         });
   
         const courseId = newCourse._id;
-        const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-        const userId = (userJson as any).user.toString();
+        const user = await UserModel.findOne({ telegramId });
+        if (!user) {throw new Error('user is not in the db');}
         
         // Добавляем ID курса к пользователю
         
         await User.findByIdAndUpdate(
-          userId,
+          user._id,
           { $push: { user_courses: courseId } },
           { new: true }
         );
@@ -219,12 +219,11 @@ class TestService {
     }
   }
 
-  async userCourses(token: string): Promise<any> {
+  async userCourses(telegramId: string): Promise<any> {
     try {
-      const userRefreshToken = await RefreshTokenModel.findOne({ token }).select('user');
-      const userId = (userRefreshToken as any).user;
-
-      const userData = await User.findById(userId).select('user_courses');
+      const user = await UserModel.findOne({ telegramId });
+      if (!user) {throw new Error('user is not in the db');}
+      const userData = await User.findById(user._id).select('user_courses');
       
       return userData
     } catch (err) {
