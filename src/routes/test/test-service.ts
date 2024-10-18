@@ -231,6 +231,16 @@ class TestService {
       throw err;
     }
   }
+  async addGold(telegramId: string, goldAmount: number): Promise<{newGoldAmount: number }> {
+    const user = await UserModel.findOne({telegramId});
+    if(!user){
+      throw new Error('User not found');
+    }
+     const newGoldAmount = (user.gold || 0) + goldAmount;
+    user.gold = newGoldAmount;
+    await user.save();
+    return { newGoldAmount};
+}
 
 
   async getTopic(id_of_course, id_of_topic: string): Promise<ITopic | null> {
