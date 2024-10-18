@@ -16,20 +16,20 @@ class CourseController {
         
         const courseData = req.body;
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        const token = req.body.token;
+        const telegramId = req.body.telegramId;
         const userInput = req.body.userInput;
         const user_interest = req.body.user_interest;
     
         const courseFile = files['material'] ? files['material'][0] : null;
     
-        if (!courseFile || !token) {
+        if (!courseFile || !telegramId) {
           res.status(400).json({ message: 'Course file is required' });
           return;
         }
     
         const newCourse = await this.testService.createCourse(
           courseData,
-          token,
+          telegramId,
           user_interest,
           userInput,
           courseFile.buffer,
@@ -41,18 +41,18 @@ class CourseController {
       else{
         console.log("without material");
         const courseData = req.body;
-        const token = req.body.token;
+        const telegramId = req.body.telegramId;
         const userInput = req.body.userInput;
         const user_interest = req.body.user_interest;
     
-        if (!token) {
+        if (!telegramId) {
           res.status(400).json({ message: 'Course file is required' });
           return;
         }
     
         const newCourse = await this.testService.createCourse(
           courseData,
-          token,
+          telegramId,
           userInput,
           user_interest,
           "",
@@ -126,9 +126,9 @@ class CourseController {
 
   userCourses = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { token } = req.body;
+      const { telegramId } = req.body;
 
-      const course = await this.testService.userCourses(token);
+      const course = await this.testService.userCourses(telegramId);
 
       if (course) {
         res.status(200).json(course);
