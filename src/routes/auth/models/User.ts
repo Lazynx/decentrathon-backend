@@ -1,7 +1,8 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Document, Schema, ObjectId } from 'mongoose'
 
 export interface IUser extends Document {
   // Telegram Authentication Fields
+  _id: ObjectId;
   telegramId: number // Уникальный идентификатор пользователя в Telegram
   username?: string // Имя пользователя в Telegram (опционально)
   firstName?: string // Имя (опционально)
@@ -15,6 +16,7 @@ export interface IUser extends Document {
   currentTime: Date // Текущее время или время последнего обновления
   streak: number // Количество дней подряд, когда пользователь был активен
   xp: number // Текущий XP пользователя
+  currency: number
 }
 
 const UserSchema: Schema = new Schema({

@@ -20,6 +20,7 @@ interface UserInfoResponse {
 }
 
 export class AuthService {
+  
   /**
    * Register a new user or return existing user
    */

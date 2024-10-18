@@ -9,7 +9,7 @@ import cors from 'cors';
 import { Bot } from 'grammy';
 import User from './routes/auth/models/User';
 import AuthService from './routes/auth/auth-service';
-import authRouter from './routes/auth'; // Импортируйте маршруты авторизации
+import authRouter from './routes/auth/auth-router'; // Импортируйте маршруты авторизации
 
 dotenv.config();
 
@@ -52,6 +52,9 @@ app.get('/', async (req, res) => {
   }
 });
 
+//tamirlan creating authService object there
+const authService = new AuthService();
+
 // Создание бота
 const bot = new Bot(process.env.TELEGRAM_TOKEN as string);
 
@@ -63,7 +66,7 @@ bot.command('start', async (ctx) => {
       
       if (!existingUser) {
         // Регистрация нового пользователя через AuthService и ожидание результата
-        existingUser = await AuthService.registerUser({
+        existingUser = await authService.registerUser({
           telegramId: user.id,
           username: user.username || '',
           firstName: user.first_name || '',
