@@ -15,4 +15,6 @@ const userController = new UserController(userService);
 
 usersRouter.get('/users', userController.getTopUsers)
 
+
+
 export default usersRouter;

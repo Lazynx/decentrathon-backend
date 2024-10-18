@@ -133,18 +133,17 @@ export class AuthService {
       throw new Error('Failed to add XP')
     }
   }
-
-  // Update user gold
-
-  async updateCurrency(telegramId: string, newAmount: number){
-    const user = await UserModel.findOne({ telegramId});
-    if (!user){
-      throw new Error('user not found');
+  
+  //Add gold to user by tg id
+  async addGold(telegramId: string, goldAmount: number){
+    const user = await UserModel.findOne({telegramId});
+    if(!user){
+      throw new Error('User not found');
     }
-
-    user.gold = newAmount;
+     const newGoldAmount = (user.gold || 0) + goldAmount;
+    user.gold = newGoldAmount;
     await user.save();
-  }
+}
 
   // Get user gold
   async getGold(telegramId: string): Promise<number> {
