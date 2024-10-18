@@ -15,7 +15,8 @@ class AuthController {
       const user = await this.authService.registerUser(createUserDto)
       res.status(201).json(user)
     } catch (err) {
-      res.status(500).json({ message: 'Error registering user' })
+      console.error('Error during user registration:', err); 
+      res.status(500).json({ message: 'Error registering user', error: err });
     }
   }
 

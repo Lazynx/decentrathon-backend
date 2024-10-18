@@ -13,7 +13,7 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const ORIGIN = process.env.ORIGIN || 'https://spirality-frontend.vercel.app';
+const ORIGIN = process.env.ORIGIN || 'https://decentrathon-frontend.vercel.app';
 
 app.use(cors({
   origin: ORIGIN,
@@ -38,7 +38,7 @@ bot.command('start', async (ctx) => {
           {
             text: 'Открыть Spirality',
             web_app: {
-              url: 'https://spirality-frontend.vercel.app'
+              url: ORIGIN
             }
           }
         ]
@@ -64,5 +64,5 @@ bot.start(); // Это включает long polling
 const server = createServer(app);
 
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at ${process.env.ORIGIN}`);
 });
