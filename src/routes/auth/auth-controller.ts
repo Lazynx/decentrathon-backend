@@ -63,19 +63,19 @@ class AuthController {
   /**
    * Update user's current time and streak
    */
-  updateCurrentTime = async (req: Request<{}, {}, { token: string }>, res: Response): Promise<void> => {
+  updateCurrentTime = async (req: Request<{}, {}, { telegramId: string }>, res: Response): Promise<void> => {
     try {
-      const { token } = req.body
+      const { telegramId } = req.body
       
-      if (!token) {
-        this.sendResponse(res, 400, undefined, undefined, 'Token is required')
+      if (!telegramId) {
+        this.sendResponse(res, 400, undefined, undefined, 'TelegramId is required')
         return
       }
 
-      const result = await this.authService.updateCurrentTime(token)
+      const result = await this.authService.updateCurrentTime(telegramId)
       
       if (!result || !result.updatedUser) {
-        this.sendResponse(res, 401, undefined, undefined, 'Invalid token or user not found')
+        this.sendResponse(res, 401, undefined, undefined, 'Invalid telegramId or user not found')
         return
       }
 
@@ -96,7 +96,7 @@ class AuthController {
       const { telegramId } = req.body
       
       if (!telegramId) {
-        this.sendResponse(res, 400, undefined, undefined, 'Token is required')
+        this.sendResponse(res, 400, undefined, undefined, 'telegramId is required')
         return
       }
 
@@ -134,7 +134,7 @@ class AuthController {
       const result = await this.authService.userInfo(telegramId)
       
       if (!result || !result.user) {
-        this.sendResponse(res, 401, undefined, undefined, 'Invalid token or user not found')
+        this.sendResponse(res, 401, undefined, undefined, 'Invalid telegramId or user not found')
         return
       }
 

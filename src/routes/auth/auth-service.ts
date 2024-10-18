@@ -166,7 +166,7 @@ export class AuthService {
     try {
       const user = await UserModel.findOne({ telegramId });
       if (!user) throw new Error('User not found');
-
+      
       return { user };
     } catch (error) {
       console.error('Error fetching user info:', error)

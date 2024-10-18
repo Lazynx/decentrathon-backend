@@ -228,6 +228,7 @@ class TestService {
       throw err;
     }
   }
+  
   async addGold(telegramId: string, goldAmount: number): Promise<{newGoldAmount: number }> {
     const user = await UserModel.findOne({telegramId});
     if(!user){

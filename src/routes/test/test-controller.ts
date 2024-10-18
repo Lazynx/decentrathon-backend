@@ -153,7 +153,7 @@ class CourseController {
 
       if (course) {
         // После успешного завершения темы, добавляем "голду" пользователю
-        const telegramId = req.body.telegramId; // Предположим, что telegramId передаётся в теле запроса
+        const { telegramId } = req.body; // Предположим, что telegramId передаётся в теле запроса
         const goldAmount = 100; // Пример значения для добавления "голды", можно заменить на свою логику
 
         // Вызов метода addGold из AuthService
