@@ -1,8 +1,7 @@
 // auth-service.ts
 import { CreateUserDto } from './dtos/CreateUser.dto'
-import { IUser } from './models/User'
+import User, { IUser } from './models/User'
 import UserModel from './models/User'
-import RefreshTokenModel from './models/RefreshToken'
 import { Document } from 'mongoose'
 import dotenv from 'dotenv'
 
@@ -62,16 +61,13 @@ export class AuthService {
   /**
    * Update user's current time and calculate streak
    */
-  async updateCurrentTime(token: string): Promise<TimeUpdateResponse> {
+  async updateCurrentTime(telegramId: string): Promise<TimeUpdateResponse> {
     try {
-      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
-      if (!userDoc?.user) throw new Error('Token not found or invalid')
-
-      const userId = userDoc.user.toString()
-      const currentTime = new Date()
-
-      const user = await UserModel.findById(userId)
+      // Поиск пользователя по telegramId
+      const user = await UserModel.findOne({ telegramId })
       if (!user) throw new Error('User not found')
+
+      const currentTime = new Date()
 
       const millisecondsInDay = 24 * 60 * 60 * 1000
       const lastTime = user.lastTime
@@ -87,8 +83,9 @@ export class AuthService {
         }
       }
 
+      // Обновление полей currentTime, lastTime и streak
       const updatedUser = await UserModel.findByIdAndUpdate(
-        userId,
+        user._id,
         { 
           currentTime,
           lastTime: currentTime,
@@ -103,20 +100,17 @@ export class AuthService {
       throw new Error('Failed to update time')
     }
   }
-
   /**
    * Add XP to user and handle level progression
    */
-  async addXp(token: string): Promise<XpUpdateResponse> {
+  async addXp(telegramId: string): Promise<XpUpdateResponse> {
     try {
-      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
-      if (!userDoc?.user) throw new Error('Token not found or invalid')
+      const userDoc = await UserModel.findOne({ telegramId })
+      if (!userDoc) throw new Error('telegramId not found or invalid')
 
-      const userId = userDoc.user.toString()
-      const user = await UserModel.findById(userId)
-      if (!user) throw new Error('User not found')
+    
 
-      let { xp, nextLevel, level } = user
+      let { xp, nextLevel, level } = userDoc
 
       // Add XP and check for level up
       xp += 250
@@ -127,7 +121,7 @@ export class AuthService {
       }
 
       const updatedUser = await UserModel.findByIdAndUpdate(
-        userId,
+        userDoc.id,
         { xp, nextLevel, level },
         { new: true }
       )
@@ -142,7 +136,7 @@ export class AuthService {
   // Update user currency
 
   async updateCurrency(telegramId: string, newAmount: number){
-    const user = await UserModel.findOne({ _id: telegramId});
+    const user = await UserModel.findOne({ telegramId });
     if (!user){
       throw new Error('user not found');
     }
@@ -154,16 +148,12 @@ export class AuthService {
   /**
    * Get user information
    */
-  async userInfo(token: string): Promise<UserInfoResponse> {
+  async userInfo(telegramId: string): Promise<UserInfoResponse> {
     try {
-      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
-      if (!userDoc?.user) throw new Error('Token not found or invalid')
+      const user = await UserModel.findOne({ telegramId });
+      if (!user) throw new Error('User not found');
 
-      const userId = userDoc.user.toString()
-      const user = await UserModel.findById(userId)
-      if (!user) throw new Error('User not found')
-
-      return { user }
+      return { user };
     } catch (error) {
       console.error('Error fetching user info:', error)
       throw new Error('Failed to fetch user info')
@@ -173,9 +163,9 @@ export class AuthService {
   /**
    * Add course to user's course list
    */
-  async addUserCourse(userId: string, courseId: string): Promise<IUser> {
+  async addUserCourse(telegramId: string, courseId: string): Promise<IUser> {
     try {
-      const user = await UserModel.findById(userId)
+      const user = await UserModel.findOne({ telegramId });
       if (!user) throw new Error('User not found')
 
       if (!user.userCourses.includes(courseId)) {

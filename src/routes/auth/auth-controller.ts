@@ -2,6 +2,7 @@
 import { Request, Response } from 'express'
 import { CreateUserDto } from './dtos/CreateUser.dto'
 import AuthService from './auth-service';
+import User from './models/User';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -121,16 +122,16 @@ class AuthController {
   /**
    * Get user information
    */
-  userInfo = async (req: Request<{}, {}, { token: string }>, res: Response): Promise<void> => {
+  userInfo = async (req: Request<{}, {}, { telegramId: string }>, res: Response): Promise<void> => {
     try {
-      const { token } = req.body
+      const { telegramId } = req.body
       
-      if (!token) {
-        this.sendResponse(res, 400, undefined, undefined, 'Token is required')
+      if (!telegramId) {
+        this.sendResponse(res, 400, undefined, undefined, 'TelegramId is required')
         return
       }
 
-      const result = await this.authService.userInfo(token)
+      const result = await this.authService.userInfo(telegramId)
       
       if (!result || !result.user) {
         this.sendResponse(res, 401, undefined, undefined, 'Invalid token or user not found')

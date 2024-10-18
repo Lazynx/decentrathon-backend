@@ -18,6 +18,7 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 8000;
 const ORIGIN = process.env.ORIGIN || 'https://spirality-frontend.vercel.app';
+console.log( "" + process.env.OPENAI_API_KEY)
 
 // Проверка наличия TELEGRAM_TOKEN
 if (!process.env.TELEGRAM_TOKEN) {
@@ -56,63 +57,63 @@ app.get('/', async (req, res) => {
 const authService = new AuthService();
 
 // Создание бота
-const bot = new Bot(process.env.TELEGRAM_TOKEN as string);
+// const bot = new Bot(process.env.TELEGRAM_TOKEN as string);
 
-bot.command('start', async (ctx) => {
-  const user = ctx.from;
-  if (user) {
-    try {
-      let existingUser = await User.findOne({ telegramId: user.id });
+// bot.command('start', async (ctx) => {
+//   const user = ctx.from;
+//   if (user) {
+//     try {
+//       let existingUser = await User.findOne({ telegramId: user.id });
       
-      if (!existingUser) {
-        // Регистрация нового пользователя через AuthService и ожидание результата
-        existingUser = await authService.registerUser({
-          telegramId: user.id,
-          username: user.username || '',
-          firstName: user.first_name || '',
-          lastName: user.last_name || '',
-        });
+//       if (!existingUser) {
+//         // Регистрация нового пользователя через AuthService и ожидание результата
+//         existingUser = await authService.registerUser({
+//           telegramId: user.id,
+//           username: user.username || '',
+//           firstName: user.first_name || '',
+//           lastName: user.last_name || '',
+//         });
         
-        console.log(`New user saved: ${existingUser.username}`);
-      } else {
-        console.log(`User already exists: ${existingUser.username}`);
-      }
+//         console.log(`New user saved: ${existingUser.username}`);
+//       } else {
+//         console.log(`User already exists: ${existingUser.username}`);
+//       }
 
-      await ctx.reply('Привет! Нажми на кнопку, чтобы открыть приложение Spirality', {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: 'Открыть Spirality',
-                web_app: {
-                  url: 'https://spirality-frontend.vercel.app'
-                }
-              }
-            ]
-          ]
-        }
-      });
-    } catch (error) {
-      console.error('Error saving user:', error);
-      await ctx.reply('Произошла ошибка при сохранении вашего профиля.');
-    }
-  } else {
-    await ctx.reply('Не удалось определить ваш профиль.');
-  }
-});
+//       await ctx.reply('Привет! Нажми на кнопку, чтобы открыть приложение Spirality', {
+//         reply_markup: {
+//           inline_keyboard: [
+//             [
+//               {
+//                 text: 'Открыть Spirality',
+//                 web_app: {
+//                   url: 'https://spirality-frontend.vercel.app'
+//                 }
+//               }
+//             ]
+//           ]
+//         }
+//       });
+//     } catch (error) {
+//       console.error('Error saving user:', error);
+//       await ctx.reply('Произошла ошибка при сохранении вашего профиля.');
+//     }
+//   } else {
+//     await ctx.reply('Не удалось определить ваш профиль.');
+//   }
+// });
 
-// Обработчик команды /help для бота
-bot.command('help', (ctx) => {
-  ctx.reply('Список команд: /start — открыть приложение, /help — помощь.');
-});
+// // Обработчик команды /help для бота
+// bot.command('help', (ctx) => {
+//   ctx.reply('Список команд: /start — открыть приложение, /help — помощь.');
+// });
 
-// Обработка всех сообщений
-bot.on('message', (ctx) => {
-  ctx.reply('Напиши /start, чтобы открыть приложение.');
-});
+// // Обработка всех сообщений
+// bot.on('message', (ctx) => {
+//   ctx.reply('Напиши /start, чтобы открыть приложение.');
+// });
 
-// Запуск polling
-bot.start(); // Это включает long polling
+// // Запуск polling
+// bot.start(); // Это включает long polling
 
 // Запуск сервера Express
 const server = createServer(app);

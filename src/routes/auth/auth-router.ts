@@ -4,12 +4,11 @@ import AuthController from './auth-controller'
 import AuthService from './auth-service'
 
 const authRouter = Router()
-
 const authService = new AuthService()
 const authController = new AuthController(authService)
 
 // Register
-// authRouter.post('/register', authController.registerUser)
+authRouter.post('/register', authController.registerUser)
 // authRouter.post('/login', authController.loginUser)
 // authRouter.post('/refresh-token', authController.refreshToken)
 
