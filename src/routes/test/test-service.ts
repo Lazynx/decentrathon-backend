@@ -125,16 +125,14 @@ class TestService {
           imageUrl: imageUrl
         });
   
-        const courseId = newCourse._id;
-        const user = await UserModel.findOne({ telegramId });
-        if (!user) {throw new Error('user is not in the db');}
-        
-        // Добавляем ID курса к пользователю
-        
-        await User.findByIdAndUpdate(
-          user._id,
-          { $push: { user_courses: courseId } },
-          { new: true }
+        const savedCourse = await newCourse.save();
+        console.log('Course saved to database:', savedCourse);
+  
+        // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
+        const updatedUser = await UserModel.findOneAndUpdate(
+          { telegramId: telegramId }, // Поиск по Telegram ID
+          { $push: { user_courses: savedCourse._id } }, // Добавление ID курса
+          { new: true } // Возврат обновлённого документа
         );
         
         console.log('Saving test to database:', newCourse);
@@ -184,20 +182,19 @@ class TestService {
           ...course,
           headName: testDescriptions.course_structure.head_name,
           topics: testDescriptions.course_structure.topics,
-          imageUrl: "without-image-url"
+          imageUrl: "imageUrl"
         });
-  
-        const courseId = newCourse._id;
-        const user = await UserModel.findOne({ telegramId });
-        if (!user) {throw new Error('user is not in the db');}
-        
-        // Добавляем ID курса к пользователю
-        
-        await User.findByIdAndUpdate(
-          user._id,
-          { $push: { user_courses: courseId } },
-          { new: true }
+
+        const savedCourse = await newCourse.save();
+        console.log('Course saved to database:', savedCourse);
+
+        // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
+        const updatedUser = await UserModel.findOneAndUpdate(
+          { telegramId: telegramId }, // Поиск по Telegram ID
+          { $push: { user_courses: savedCourse._id } }, // Добавление ID курса
+          { new: true } // Возврат обновлённого документа
         );
+   
         
         console.log('Saving test to database:', newCourse);
         const savedTest = await newCourse.save();
