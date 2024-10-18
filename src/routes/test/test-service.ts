@@ -131,7 +131,7 @@ class TestService {
         // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
         const updatedUser = await UserModel.findOneAndUpdate(
           { telegramId: telegramId }, // Поиск по Telegram ID
-          { $push: { user_courses: savedCourse._id } }, // Добавление ID курса
+          { $push: { userCourses: savedCourse._id } }, // Добавление ID курса
           { new: true } // Возврат обновлённого документа
         );
         
@@ -191,7 +191,7 @@ class TestService {
         // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
         const updatedUser = await UserModel.findOneAndUpdate(
           { telegramId: telegramId }, // Поиск по Telegram ID
-          { $push: { user_courses: savedCourse._id } }, // Добавление ID курса
+          { $push: { userCourses: savedCourse._id } }, // Добавление ID курса
           { new: true } // Возврат обновлённого документа
         );
    
