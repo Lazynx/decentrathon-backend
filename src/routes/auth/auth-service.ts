@@ -121,8 +121,8 @@ export class AuthService {
         level += 1
       }
 
-      const updatedUser = await UserModel.findByIdAndUpdate(
-        userDoc.id,
+      const updatedUser = await UserModel.findOneAndUpdate(
+        {telegramId: telegramId},
         { xp, nextLevel, level },
         { new: true }
       )

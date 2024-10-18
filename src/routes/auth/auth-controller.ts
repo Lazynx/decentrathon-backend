@@ -91,16 +91,16 @@ class AuthController {
   /**
    * Add XP to user
    */
-  addXp = async (req: Request<{}, {}, { token: string }>, res: Response): Promise<void> => {
+  addXp = async (req: Request<{}, {}, { telegramId: string }>, res: Response): Promise<void> => {
     try {
-      const { token } = req.body
+      const { telegramId } = req.body
       
-      if (!token) {
+      if (!telegramId) {
         this.sendResponse(res, 400, undefined, undefined, 'Token is required')
         return
       }
 
-      const result = await this.authService.addXp(token)
+      const result = await this.authService.addXp(telegramId)
       
       if (!result || !result.updatedUser) {
         this.sendResponse(res, 401, undefined, undefined, 'Invalid token or user not found')
