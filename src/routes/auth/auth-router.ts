@@ -1,5 +1,5 @@
 import { Router } from 'express'
-// import { authMiddleware } from '../../middlewares/auth-middleware'
+import { authMiddleware } from '../../middlewares/auth-middleware'
 import AuthController from './auth-controller'
 import AuthService from './auth-service'
 
@@ -20,9 +20,9 @@ authRouter.put('/updateCurrentTime', authController.updateCurrentTime)
 authRouter.put('/addXp', authController.addXp)
 
 
-// // Check
-// authRouter.get('/protected', authMiddleware, (req, res) => {
-//   res.json({ message: 'You have access to this route!' })
-// })
+// Check
+authRouter.get('/protected', authMiddleware, (req, res) => {
+  res.json({ message: 'You have access to this route!' })
+})
 
 export default authRouter
