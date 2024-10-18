@@ -16,7 +16,7 @@ export interface IUser extends Document {
   currentTime: Date // Текущее время или время последнего обновления
   streak: number // Количество дней подряд, когда пользователь был активен
   xp: number // Текущий XP пользователя
-  currency: number
+  currency: number //Внутриигровая валюта, ее крч можно обменять на коины
 }
 
 const UserSchema: Schema = new Schema({
@@ -34,7 +34,8 @@ const UserSchema: Schema = new Schema({
   lastTime: { type: Date, default: Date.now }, // Время последнего взаимодействия
   currentTime: { type: Date, default: Date.now }, // Текущее время или время последнего обновления
   streak: { type: Number, default: 0 }, // Количество дней подряд, когда пользователь был активен
-  xp: { type: Number, default: 0 } // Текущий XP пользователя
+  xp: { type: Number, default: 0 }, // Текущий XP пользователя
+  currency: { type: Number, default: 0}, // внутриигровая валюта, нуль по умолчанию
 })
 
 

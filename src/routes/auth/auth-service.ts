@@ -4,6 +4,9 @@ import { IUser } from './models/User'
 import UserModel from './models/User'
 import RefreshTokenModel from './models/RefreshToken'
 import { Document } from 'mongoose'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 interface TimeUpdateResponse {
   updatedUser: IUser | null;
@@ -134,6 +137,18 @@ export class AuthService {
       console.error('Error adding XP:', error)
       throw new Error('Failed to add XP')
     }
+  }
+
+  // Update user currency
+
+  async updateCurrency(telegramId: string, newAmount: number){
+    const user = await UserModel.findOne({ _id: telegramId});
+    if (!user){
+      throw new Error('user not found');
+    }
+
+    user.currency = newAmount;
+    await user.save();
   }
 
   /**
