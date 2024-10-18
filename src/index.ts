@@ -68,10 +68,10 @@ const authService = new AuthService();
 //       if (!existingUser) {
 //         // Регистрация нового пользователя через AuthService и ожидание результата
 //         existingUser = await authService.registerUser({
-//           telegramId: user.id,
-//           username: user.username || '',
-//           firstName: user.first_name || '',
-//           lastName: user.last_name || '',
+          // telegramId: user.id,
+          // username: user.username || '',
+          // firstName: user.first_name || '',
+          // lastName: user.last_name || '',
 //         });
         
 //         console.log(`New user saved: ${existingUser.username}`);
