@@ -48,7 +48,8 @@ export class AuthService {
         lastTime: currentTime,
         currentTime: currentTime,
         streak: 0,
-        xp: 0
+        xp: 0,
+        gold: 0
       })
 
       return await newUser.save()
@@ -133,16 +134,29 @@ export class AuthService {
     }
   }
 
-  // Update user currency
+  // Update user gold
 
   async updateCurrency(telegramId: string, newAmount: number){
-    const user = await UserModel.findOne({ telegramId });
+    const user = await UserModel.findOne({ telegramId});
     if (!user){
       throw new Error('user not found');
     }
 
-    user.currency = newAmount;
+    user.gold = newAmount;
     await user.save();
+  }
+
+  // Get user gold
+  async getGold(telegramId: string): Promise<number> {
+    const user = await UserModel.findOne({telegramId});
+
+    if(!user){
+      throw new Error('User not found');
+    }
+
+    console.log('User ${userId} has ${user.currencyAmount} currency');
+
+    return user.gold;
   }
 
   /**
