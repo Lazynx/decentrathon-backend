@@ -2,214 +2,193 @@
 import { CreateUserDto } from './dtos/CreateUser.dto'
 import { IUser } from './models/User'
 import UserModel from './models/User'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
 import RefreshTokenModel from './models/RefreshToken'
+import { Document } from 'mongoose'
 
-dotenv.config()
+interface TimeUpdateResponse {
+  updatedUser: IUser | null;
+  streak: number;
+}
 
-class AuthService {
-  private readonly jwtSecret = process.env.JWT_SECRET!
-  private readonly jwtRefreshSecret = process.env.JWT_REFRESH_SECRET!
+interface XpUpdateResponse {
+  updatedUser: IUser | null;
+  newXp: number;
+}
 
+interface UserInfoResponse {
+  user: IUser | null;
+}
+
+export class AuthService {
+  /**
+   * Register a new user or return existing user
+   */
   async registerUser(createUserDto: CreateUserDto): Promise<IUser> {
-    const { email, password, username, surveyAnswers } = createUserDto
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const currentTime = new Date()
+    const { telegramId, username, firstName, lastName } = createUserDto
 
-    const newUser = new UserModel({
-      email,
-      username,
-      surveyAnswers,
-      password: hashedPassword,
-      last_time: currentTime,
-      current_time: currentTime
-    })
-
-    await newUser.save()
-    return newUser
-  }
-
-  async loginUser(
-    email: string,
-    password: string
-  ): Promise<{
-    user: IUser
-    accessToken: string
-    refreshToken: string
-  } | null> {
-    const user = await UserModel.findOne({ email })
-    if (!user) return null
-
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-    if (!isPasswordValid) return null
-
-    const accessToken = this.generateJwt(user)
-    const refreshToken = this.generateRefreshToken(user)
-
-    const refreshTokenDoc = new RefreshTokenModel({
-      token: refreshToken,
-      user: user._id
-    })
-    await refreshTokenDoc.save()
-
-    return { user, accessToken, refreshToken }
-  }
-
-  async updateCurrentTime(token: string): Promise<any> {
-    const user_json = await RefreshTokenModel.findOne({ token }).select('user');
-    const user_id = ((user_json as any).user);
-  
-    const currentTime = new Date();
-  
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      (user_id as any).toString(),
-      { current_time: currentTime },
-      { new: true }
-    );
-    const millisecondsInDay = 24 * 60 * 60 * 1000;
-  
-    const lastTime = updatedUser?.last_time;
-    let streakDays: number | undefined;
-  
-    if (lastTime) {
-      streakDays = (currentTime.getTime() - new Date(lastTime).getTime()) / millisecondsInDay;
-    }
-  
-    let streak = updatedUser?.streak || 0;
-    if (streakDays !== undefined) {
-      if (streakDays - streak >= 1 && streakDays - streak < 2) {
-        streak += 1;
-      } else if(streakDays - streak >= 2){
-        streak = 0;
-        const lastTime = currentTime;
-      }
-    }
-  
-    const finalUpdatedUser = await UserModel.findByIdAndUpdate(
-      (user_id as any).toString(),
-      { streak, last_time: lastTime },
-      { new: true }
-    );
-  
-    return { updatedUser: finalUpdatedUser, streak };
-  }
-
-  async addXp(token: string): Promise<any> {
     try {
-      const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-      if (!userJson) {
-        throw new Error('Token not found');
-      }
-  
-      const userId = userJson.user.toString();
-  
-      const User = await UserModel.findById(userId);
-      if (!User) {
-        throw new Error('User not found');
-      }
-  
-      let newXp = (User.xp || 0) + 250;
-      let next_level_upd = User.next_level;
-      let level_upd = User.level;
-
-      if (newXp >= next_level_upd) {
-          newXp = 0;
-          next_level_upd += 750;
-          level_upd += 1;  
+      const existingUser = await UserModel.findOne({ telegramId })
+      if (existingUser) {
+        return existingUser
       }
 
-      const finalUpdatedUser = await UserModel.findByIdAndUpdate(
+      const currentTime = new Date()
+      const newUser = new UserModel({
+        telegramId,
+        username: username || '',
+        firstName: firstName || '',
+        lastName: lastName || '',
+        surveyAnswers: [],
+        userCourses: [],
+        level: 1,
+        nextLevel: 750,
+        lastTime: currentTime,
+        currentTime: currentTime,
+        streak: 0,
+        xp: 0
+      })
+
+      return await newUser.save()
+    } catch (error) {
+      console.error('Error in user registration:', error)
+      throw new Error('Failed to register user')
+    }
+  }
+
+  /**
+   * Update user's current time and calculate streak
+   */
+  async updateCurrentTime(token: string): Promise<TimeUpdateResponse> {
+    try {
+      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
+      if (!userDoc?.user) throw new Error('Token not found or invalid')
+
+      const userId = userDoc.user.toString()
+      const currentTime = new Date()
+
+      const user = await UserModel.findById(userId)
+      if (!user) throw new Error('User not found')
+
+      const millisecondsInDay = 24 * 60 * 60 * 1000
+      const lastTime = user.lastTime
+      let streak = user.streak
+
+      if (lastTime) {
+        const daysDifference = (currentTime.getTime() - lastTime.getTime()) / millisecondsInDay
+        
+        if (daysDifference >= 1 && daysDifference < 2) {
+          streak += 1
+        } else if (daysDifference >= 2) {
+          streak = 0
+        }
+      }
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
         userId,
-        { xp: newXp, next_level: next_level_upd, level: level_upd},
+        { 
+          currentTime,
+          lastTime: currentTime,
+          streak
+        },
         { new: true }
-      );
-  
-      if (!finalUpdatedUser) {
-        throw new Error('Failed to update user XP');
-      }
-  
-      return { updatedUser: finalUpdatedUser, newXp };
+      )
+
+      return { updatedUser, streak }
     } catch (error) {
-      return { error: error };
+      console.error('Error updating time:', error)
+      throw new Error('Failed to update time')
     }
   }
-  
-  
-  async userInfo(token: string): Promise<any> {
+
+  /**
+   * Add XP to user and handle level progression
+   */
+  async addXp(token: string): Promise<XpUpdateResponse> {
     try {
-      const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-      if (!userJson) {
-        throw new Error('Token not found');
+      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
+      if (!userDoc?.user) throw new Error('Token not found or invalid')
+
+      const userId = userDoc.user.toString()
+      const user = await UserModel.findById(userId)
+      if (!user) throw new Error('User not found')
+
+      let { xp, nextLevel, level } = user
+
+      // Add XP and check for level up
+      xp += 250
+      if (xp >= nextLevel) {
+        xp = 0
+        nextLevel += 750
+        level += 1
       }
-  
-      const userId = userJson.user.toString();
-  
-      const User = await UserModel.findById(userId);
-      if (!User) {
-        throw new Error('User not found');
-      }
-  
-      
-      return { user: User };
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { xp, nextLevel, level },
+        { new: true }
+      )
+
+      return { updatedUser, newXp: xp }
     } catch (error) {
-      return { error: error };
+      console.error('Error adding XP:', error)
+      throw new Error('Failed to add XP')
     }
   }
-  
-  private generateJwt(user: IUser): string {
-    return jwt.sign({ id: user._id, email: user.email }, this.jwtSecret, {
-      expiresIn: '30d'
-    })
-  }
-  
-  private generateRefreshToken(user: IUser): string {
-    return jwt.sign(
-      { id: user._id, email: user.email },
-      this.jwtRefreshSecret,
-      { expiresIn: '60d' }
-    )
-  }
 
-  verifyJwt(token: string): any {
+  /**
+   * Get user information
+   */
+  async userInfo(token: string): Promise<UserInfoResponse> {
     try {
-      return jwt.verify(token, this.jwtSecret)
-    } catch (err) {
-      return null
+      const userDoc = await RefreshTokenModel.findOne({ token }).select('user')
+      if (!userDoc?.user) throw new Error('Token not found or invalid')
+
+      const userId = userDoc.user.toString()
+      const user = await UserModel.findById(userId)
+      if (!user) throw new Error('User not found')
+
+      return { user }
+    } catch (error) {
+      console.error('Error fetching user info:', error)
+      throw new Error('Failed to fetch user info')
     }
   }
 
-  verifyRefreshToken(token: string): any {
+  /**
+   * Add course to user's course list
+   */
+  async addUserCourse(userId: string, courseId: string): Promise<IUser> {
     try {
-      return jwt.verify(token, this.jwtRefreshSecret)
-    } catch (err) {
-      return null
+      const user = await UserModel.findById(userId)
+      if (!user) throw new Error('User not found')
+
+      if (!user.userCourses.includes(courseId)) {
+        user.userCourses.push(courseId)
+        return await user.save()
+      }
+
+      return user
+    } catch (error) {
+      console.error('Error adding course:', error)
+      throw new Error('Failed to add course')
     }
   }
 
-  async refreshToken(
-    oldToken: string
-  ): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const payload = this.verifyRefreshToken(oldToken)
-    if (!payload) return null
+  /**
+   * Add survey answer for user
+   */
+  async addSurveyAnswer(userId: string, answer: string): Promise<IUser> {
+    try {
+      const user = await UserModel.findById(userId)
+      if (!user) throw new Error('User not found')
 
-    const user = await UserModel.findById(payload.id)
-    if (!user) return null
-
-    const newAccessToken = this.generateJwt(user)
-    const newRefreshToken = this.generateRefreshToken(user)
-
-    const refreshTokenDoc = new RefreshTokenModel({
-      token: newRefreshToken,
-      user: user._id
-    })
-    await refreshTokenDoc.save()
-
-    await RefreshTokenModel.deleteOne({ token: oldToken })
-
-    return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+      user.surveyAnswers.push(answer)
+      return await user.save()
+    } catch (error) {
+      console.error('Error adding survey answer:', error)
+      throw new Error('Failed to add survey answer')
+    }
   }
 }
 
-export default AuthService
+export default AuthService;

@@ -1,31 +1,39 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export interface IUser extends Document {
-  email: string
-  username?: string
-  password: string
-  surveyAnswers: [string]
-  user_courses: string[]
-  level: number
-  next_level: number
-  last_time: Date
-  current_time: Date
-  streak: number
-  xp: number
+  // Telegram Authentication Fields
+  telegramId: number // Уникальный идентификатор пользователя в Telegram
+  username?: string // Имя пользователя в Telegram (опционально)
+  firstName?: string // Имя (опционально)
+  lastName?: string // Фамилия (опционально)
+  // Дополнительные поля пользователя
+  surveyAnswers: string[] // Массив ответов на опросы
+  userCourses: string[] // Массив курсов пользователя
+  level: number // Текущий уровень пользователя
+  nextLevel: number // XP, необходимый для перехода на следующий уровень
+  lastTime: Date // Время последнего взаимодействия
+  currentTime: Date // Текущее время или время последнего обновления
+  streak: number // Количество дней подряд, когда пользователь был активен
+  xp: number // Текущий XP пользователя
 }
 
 const UserSchema: Schema = new Schema({
-  email: { type: String, required: true, unique: true },
-  username: { type: String },
-  password: { type: String, required: true },
-  surveyAnswers: {type: [String], default: []},
-  user_courses: { type: [String], default: [] },
-  level: { type: Number, default: 1 },
-  next_level: { type: Number, default: 750 },
-  last_time: { type: Date, default: Date.now },
-  current_time: { type: Date, default: Date.now },
-  streak: { type: Number, default: 1 },
-  xp: { type: Number, default: 0 }
+  // Telegram Authentication Fields
+  telegramId: { type: Number, required: true, unique: true }, // Уникальный идентификатор пользователя в Telegram
+  username: { type: String }, // Имя пользователя в Telegram (опционально)
+  firstName: { type: String }, // Имя (опционально)
+  lastName: { type: String }, // Фамилия (опционально)
+
+  // Дополнительные поля пользователя
+  surveyAnswers: { type: [String], default: [] }, // Массив ответов на опросы
+  userCourses: { type: [String], default: [] }, // Массив курсов пользователя
+  level: { type: Number, default: 1 }, // Текущий уровень пользователя
+  nextLevel: { type: Number, default: 750 }, // XP, необходимый для перехода на следующий уровень
+  lastTime: { type: Date, default: Date.now }, // Время последнего взаимодействия
+  currentTime: { type: Date, default: Date.now }, // Текущее время или время последнего обновления
+  streak: { type: Number, default: 0 }, // Количество дней подряд, когда пользователь был активен
+  xp: { type: Number, default: 0 } // Текущий XP пользователя
 })
+
 
 export default mongoose.model<IUser>('User', UserSchema)
