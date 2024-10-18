@@ -13,7 +13,7 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const ORIGIN = 'https://spirality-frontend.vercel.app' || process.env.ORIGIN;
+const ORIGIN = process.env.ORIGIN || 'https://spirality-frontend.vercel.app';
 
 app.use(cors({
   origin: ORIGIN,
