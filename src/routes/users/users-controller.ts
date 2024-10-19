@@ -23,10 +23,6 @@ class UserController {
     };
 
     checkUser = async (req: Request, res: Response): Promise<void> => {
-
-    }
-
-    checkUser = async (req: Request, res: Response): Promise<void> => {
         try {
           const { telegramId } = req.body;
     
