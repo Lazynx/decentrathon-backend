@@ -24,15 +24,15 @@ class UserController {
 
     checkUser = async (req: Request, res: Response): Promise<void> => {
         try {
-          const { telegramId } = req.body;
-    
+          const { telegramId } = req.query;
+      
           if (!telegramId) {
             res.status(400).json({ message: "Telegram ID is required" });
             return;
           }
-    
-          const userExists = await this.usersService.checkUserExists(telegramId);
-    
+      
+          const userExists = await this.usersService.checkUserExists(telegramId as string);
+      
           if (userExists) {
             res.status(200).json({ exists: true });
           } else {
