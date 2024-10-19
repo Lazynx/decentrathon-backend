@@ -27,7 +27,7 @@ export class AuthService {
    * Register a new user or return existing user
    */
   async registerUser(createUserDto: CreateUserDto): Promise<IUser> {
-    const { telegramId, username, firstName, lastName } = createUserDto
+    const { telegramId, username, firstName, lastName, surveyAnswers } = createUserDto
 
     try {
       const existingUser = await UserModel.findOne({ telegramId })
@@ -41,7 +41,7 @@ export class AuthService {
         username: username || '',
         firstName: firstName || '',
         lastName: lastName || '',
-        surveyAnswers: [],
+        surveyAnswers: surveyAnswers || [],
         userCourses: [],
         level: 1,
         nextLevel: 750,
