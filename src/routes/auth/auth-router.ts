@@ -20,9 +20,9 @@ authRouter.put('/updateCurrentTime', authController.updateCurrentTime)
 authRouter.put('/addXp', authController.addXp)
 
 
-// Check
-authRouter.get('/protected', authMiddleware, (req, res) => {
-  res.json({ message: 'You have access to this route!' })
-})
+// // Check
+// authRouter.get('/protected', authMiddleware, (req, res) => {
+//   res.json({ message: 'You have access to this route!' })
+// })
 
 export default authRouter
