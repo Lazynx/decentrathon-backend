@@ -113,7 +113,6 @@ export class AuthService {
 
       let { xp, nextLevel, level } = userDoc
 
-      // Add XP and check for level up
       xp += 250
       if (xp >= nextLevel) {
         xp = 0
