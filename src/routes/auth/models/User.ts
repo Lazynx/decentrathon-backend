@@ -1,4 +1,6 @@
 import mongoose, { Document, Schema, ObjectId } from 'mongoose'
+// import Case from '../../market/models/Case'
+
 
 export interface IUser extends Document {
   // Telegram Authentication Fields
@@ -17,6 +19,7 @@ export interface IUser extends Document {
   streak: number // Количество дней подряд, когда пользователь был активен
   xp: number // Текущий XP пользователя
   gold: number //Внутриигровая валюта, ее крч можно обменять на коины
+  countOfOpenCases : number // кол-во открытых кейсов(купленных)
 }
 
 const UserSchema: Schema = new Schema({
@@ -36,7 +39,8 @@ const UserSchema: Schema = new Schema({
   streak: { type: Number, default: 0 }, // Количество дней подряд, когда пользователь был активен
   xp: { type: Number, default: 0 }, // Текущий XP пользователя
   gold: { type: Number, default: 0}, // внутриигровая валюта, нуль по умолчанию
-})
+  countOfOpenCases: {type: Number, default: 0} // кол-во открытий
+ })
 
 
 export default mongoose.model<IUser>('User', UserSchema)
