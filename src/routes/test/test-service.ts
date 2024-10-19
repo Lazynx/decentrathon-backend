@@ -217,13 +217,13 @@ class TestService {
 
   async userCourses(telegramId: string): Promise<any> {
     try {
-      const user = await UserModel.findOne({ telegramId });
-      if (!user) {throw new Error('user is not in the db');}
-      const userData = await User.findById(user._id).select('user_courses');
-      
-      return userData
+      const user = await UserModel.findOne({ telegramId }).populate('userCourses');
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user.userCourses;
     } catch (err) {
-      console.error('Error getting test:', err);
+      console.error('Error getting user courses:', err);
       throw err;
     }
   }

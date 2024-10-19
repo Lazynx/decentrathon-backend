@@ -127,17 +127,17 @@ class CourseController {
   userCourses = async (req: Request, res: Response): Promise<void> => {
     try {
       const { telegramId } = req.body;
-
-      const course = await this.testService.userCourses(telegramId);
-
-      if (course) {
-        res.status(200).json(course);
+  
+      const courses = await this.testService.userCourses(telegramId);
+  
+      if (courses) {
+        res.status(200).json({ courses });
       } else {
-        res.status(404).json({ message: 'Course not found' });
+        res.status(404).json({ message: 'No courses found for the user' });
       }
     } catch (err) {
-      console.error('Error getting course:', err);
-      res.status(500).json({ message: 'Error getting course', error: err });
+      console.error('Error getting user courses:', err);
+      res.status(500).json({ message: 'Error getting user courses', error: err });
     }
   };
 
