@@ -7,8 +7,8 @@ export const CourseSchema: Schema<ICourse> = new Schema({
     headName: { type: String, required: true }, // Adjusted to camelCase
     topics: { type: [TopicSchema], required: true },
     imageUrl: { type: String, required: true }
-  });
+});
   
-  const CourseModel: Model<ICourse> = mongoose.model<ICourse>('Course', CourseSchema);
+const CourseModel: Model<ICourse> = mongoose.model<ICourse>('Course', CourseSchema);
   
-  export default CourseModel;
+export default CourseModel;
