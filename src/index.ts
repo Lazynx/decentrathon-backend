@@ -17,8 +17,8 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
-const ORIGIN = process.env.ORIGIN || 'https://spirality-frontend.vercel.app';
-console.log( "" + process.env.OPENAI_API_KEY)
+const ORIGIN = process.env.ORIGIN || 'https://decentrathon-frontend.vercel.app';
+
 
 // Проверка наличия TELEGRAM_TOKEN
 if (!process.env.TELEGRAM_TOKEN) {
@@ -119,5 +119,5 @@ const authService = new AuthService();
 const server = createServer(app);
 
 server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at ${process.env.ORIGIN}`);
 });
