@@ -119,5 +119,5 @@ const authService = new AuthService();
 const server = createServer(app);
 
 server.listen(PORT, () => {
-  console.log(`Server running at ${process.env.ORIGIN}`);
+  console.log(`Server running at ${process.env.PORT}`);
 });
