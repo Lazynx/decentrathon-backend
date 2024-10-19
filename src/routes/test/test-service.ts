@@ -63,7 +63,7 @@ class TestService {
 
   async createCourse(
     course: Partial<ICourse>,
-    token: string,
+    telegramId: string,
     user_interest: string,
     userInput: string,
     imageBuffer: any,
@@ -125,16 +125,14 @@ class TestService {
           imageUrl: imageUrl
         });
   
-        const courseId = newCourse._id;
-        const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-        const userId = (userJson as any).user.toString();
-        
-        // Добавляем ID курса к пользователю
-        
-        await User.findByIdAndUpdate(
-          userId,
-          { $push: { user_courses: courseId } },
-          { new: true }
+        const savedCourse = await newCourse.save();
+        console.log('Course saved to database:', savedCourse);
+  
+        // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
+        const updatedUser = await UserModel.findOneAndUpdate(
+          { telegramId: telegramId }, // Поиск по Telegram ID
+          { $push: { userCourses: savedCourse._id } }, // Добавление ID курса
+          { new: true } // Возврат обновлённого документа
         );
         
         console.log('Saving test to database:', newCourse);
@@ -184,20 +182,19 @@ class TestService {
           ...course,
           headName: testDescriptions.course_structure.head_name,
           topics: testDescriptions.course_structure.topics,
-          imageUrl: "without-image-url"
+          imageUrl: "imageUrl"
         });
-  
-        const courseId = newCourse._id;
-        const userJson = await RefreshTokenModel.findOne({ token }).select('user');
-        const userId = (userJson as any).user.toString();
-        
-        // Добавляем ID курса к пользователю
-        
-        await User.findByIdAndUpdate(
-          userId,
-          { $push: { user_courses: courseId } },
-          { new: true }
+
+        const savedCourse = await newCourse.save();
+        console.log('Course saved to database:', savedCourse);
+
+        // Обновление пользователя по Telegram ID, добавление ID курса в user_courses
+        const updatedUser = await UserModel.findOneAndUpdate(
+          { telegramId: telegramId }, // Поиск по Telegram ID
+          { $push: { userCourses: savedCourse._id } }, // Добавление ID курса
+          { new: true } // Возврат обновлённого документа
         );
+   
         
         console.log('Saving test to database:', newCourse);
         const savedTest = await newCourse.save();
@@ -219,12 +216,11 @@ class TestService {
     }
   }
 
-  async userCourses(token: string): Promise<any> {
+  async userCourses(telegramId: string): Promise<any> {
     try {
-      const userRefreshToken = await RefreshTokenModel.findOne({ token }).select('user');
-      const userId = (userRefreshToken as any).user;
-
-      const userData = await User.findById(userId).select('user_courses');
+      const user = await UserModel.findOne({ telegramId });
+      if (!user) {throw new Error('user is not in the db');}
+      const userData = await User.findById(user._id).select('user_courses');
       
       return userData
     } catch (err) {
@@ -232,6 +228,17 @@ class TestService {
       throw err;
     }
   }
+  
+  async addGold(telegramId: string, goldAmount: number): Promise<{newGoldAmount: number }> {
+    const user = await UserModel.findOne({telegramId});
+    if(!user){
+      throw new Error('User not found');
+    }
+     const newGoldAmount = (user.gold || 0) + goldAmount;
+    user.gold = newGoldAmount;
+    await user.save();
+    return { newGoldAmount};
+}
 
 
   async getTopic(id_of_course, id_of_topic: string): Promise<ITopic | null> {

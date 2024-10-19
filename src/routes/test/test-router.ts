@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authMiddleware } from '../../middlewares/auth-middleware'
+// import { authMiddleware } from '../../middlewares/auth-middleware'
 import TestService from './test-service'
 import TestController from './test-controller'
 import multer from 'multer'

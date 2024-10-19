@@ -1,6 +1,7 @@
 export interface CreateUserDto {
-  username?: string
-  email: string
-  password: string
-  surveyAnswers: [string]
+  telegramId: any,
+  username: string,
+  firstName: string,
+  lastName: string,
 }
+
