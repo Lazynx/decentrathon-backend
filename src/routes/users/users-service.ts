@@ -22,6 +22,15 @@ class UserService {async getTopUsers(): Promise<{ topUsers: { _id: string, usern
         }
     }
     
+    async checkUserExists(telegramId: string): Promise<boolean> {
+        try {
+            const user = await User.findOne({ telegramId });
+            return !!user;
+        } catch (err) {
+            console.error('Error checking user existence:', err);
+            throw err;
+        }
+    }
 }
 
 export default UserService;

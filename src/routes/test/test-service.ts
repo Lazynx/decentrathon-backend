@@ -11,7 +11,6 @@ import openai from '../../openai';
 import UserModel from '../auth/models/User'
 import RefreshTokenModel from '../auth/models/RefreshToken'
 
-
 import { promptWithMaterial } from './prompt/prompt.with.material';
 import { promptWithoutMaterial } from './prompt/prompt.without.material';
 

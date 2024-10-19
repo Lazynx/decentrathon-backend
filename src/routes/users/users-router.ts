@@ -14,7 +14,6 @@ const userController = new UserController(userService);
 // const authController = new AuthController(authService);
 
 usersRouter.get('/users', userController.getTopUsers)
-
-
+usersRouter.get('/check-user', userController.checkUser)
 
 export default usersRouter;
