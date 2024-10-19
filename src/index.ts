@@ -63,35 +63,34 @@ const authService = new AuthService()
 const bot = new Bot(process.env.TELEGRAM_TOKEN as string)
 
 bot.command('start', async (ctx) => {
-  // const user = ctx.from;
-  // if (user) {
-  //   try {
-  //     let existingUser = await User.findOne({ telegramId: user.id });
+  const user = ctx.from;
+  if (user) {
+    // try {
+    //   let existingUser = await User.findOne({ telegramId: user.id });
+      
+    //   if (!existingUser) {
+    //     // Регистрация нового пользователя через AuthService и ожидание результата
+    //     existingUser = await authService.registerUser({
+    //       telegramId: user.id,
+    //       username: user.username || '',
+    //       firstName: user.first_name || '',
+    //       lastName: user.last_name || '',
+    //     });
+        
+    //     console.log(`New user saved: ${existingUser.username}`);
+    //   } else {
+    //     console.log(`User already exists: ${existingUser.username}`);
+    //   }
 
-  //     if (!existingUser) {
-  //       // Регистрация нового пользователя через AuthService и ожидание результата
-  //       existingUser = await authService.registerUser({
-  //         telegramId: user.id,
-  //         username: user.username || '',
-  //         firstName: user.first_name || '',
-  //         lastName: user.last_name || '',
-  //       });
-
-  //       console.log(`New user saved: ${existingUser.username}`);
-  //     } else {
-  //       console.log(`User already exists: ${existingUser.username}`);
-  //     }
-
-  await ctx.reply(
-    'Привет! Нажми на кнопку, чтобы открыть приложение Spirality',
-    {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: 'Открыть Spirality',
-              web_app: {
-                url: 'https://decentrathon-frontend.vercel.app'
+      await ctx.reply('Привет! Нажми на кнопку, чтобы открыть приложение Spirality', {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: 'Открыть Spirality',
+                web_app: {
+                  url: 'https://decentrathon-frontend.vercel.app'
+                }
               }
             }
           ]
